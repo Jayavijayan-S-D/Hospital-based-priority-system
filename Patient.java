@@ -4,11 +4,10 @@ public class Patient {
     private String name;
     private int age;
     private String condition;
-    private int priority; // 1-Critical, 2-High, 3-Medium, 4-Low
+    private int priority;
     private int waitTurns;
     private String assignedDoctor;
 
-    // Vitals used for auto-priority calculation (0 if entered manually)
     private int heartRate;
     private int spo2;
     private double temperature;
@@ -28,17 +27,39 @@ public class Patient {
     }
 
     public int getId() { return id; }
-    public String getName() { return name; }
-    public int getAge() { return age; }
-    public String getCondition() { return condition; }
-    public int getPriority() { return priority; }
-    public void setPriority(int priority) { this.priority = priority; }
-    public int getWaitTurns() { return waitTurns; }
-    public void incrementWait() { waitTurns++; }
-    public String getAssignedDoctor() { return assignedDoctor; }
-    public int getHeartRate() { return heartRate; }
-    public int getSpo2() { return spo2; }
-    public double getTemperature() { return temperature; }
+    public String getName() { 
+        return name;
+     }
+    public int getAge() {
+         return age; 
+        }
+    public String getCondition() {
+         return condition;
+         }
+    public int getPriority() {
+         return priority; 
+        }
+    public void setPriority(int priority) { 
+        this.priority = priority; 
+    }
+    public int getWaitTurns() {
+         return waitTurns;
+         }
+    public void incrementWait() {
+         waitTurns++;
+         }
+    public String getAssignedDoctor() {
+         return assignedDoctor;
+         }
+    public int getHeartRate() {
+         return heartRate; 
+        }
+    public int getSpo2() {
+         return spo2; 
+        }
+    public double getTemperature() {
+         return temperature; 
+        }
 
     public String getPriorityLabel() {
         switch (priority) {
