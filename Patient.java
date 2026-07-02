@@ -1,32 +1,44 @@
-public class Patient implements Comparable<Patient> {
+public class Patient {
 
+    private int id;
     private String name;
     private int age;
     private String condition;
     private int priority; // 1-Critical, 2-High, 3-Medium, 4-Low
+    private int waitTurns;
+    private String assignedDoctor;
 
-    public Patient(String name, int age, String condition, int priority) {
+    // Vitals used for auto-priority calculation (0 if entered manually)
+    private int heartRate;
+    private int spo2;
+    private double temperature;
+
+    public Patient(int id, String name, int age, String condition, int priority,
+                   String assignedDoctor, int heartRate, int spo2, double temperature) {
+        this.id = id;
         this.name = name;
         this.age = age;
         this.condition = condition;
         this.priority = priority;
+        this.assignedDoctor = assignedDoctor;
+        this.heartRate = heartRate;
+        this.spo2 = spo2;
+        this.temperature = temperature;
+        this.waitTurns = 0;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
+    public int getId() { return id; }
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public String getCondition() { return condition; }
+    public int getPriority() { return priority; }
+    public void setPriority(int priority) { this.priority = priority; }
+    public int getWaitTurns() { return waitTurns; }
+    public void incrementWait() { waitTurns++; }
+    public String getAssignedDoctor() { return assignedDoctor; }
+    public int getHeartRate() { return heartRate; }
+    public int getSpo2() { return spo2; }
+    public double getTemperature() { return temperature; }
 
     public String getPriorityLabel() {
         switch (priority) {
@@ -37,16 +49,12 @@ public class Patient implements Comparable<Patient> {
         }
     }
 
-    // Enables PriorityQueue to automatically sort patients by priority
-    @Override
-    public int compareTo(Patient other) {
-        return this.priority - other.priority;
-    }
-
     @Override
     public String toString() {
-        return "Name: " + name + " | Age: " + age
+        return "ID: " + id + " | Name: " + name + " | Age: " + age
                 + " | Condition: " + condition
-                + " | Priority: " + getPriorityLabel();
+                + " | Priority: " + getPriorityLabel()
+                + " | Waited: " + waitTurns + " turn(s)"
+                + " | Doctor: " + assignedDoctor;
     }
 }
