@@ -1,45 +1,52 @@
-import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Main {
 
-    private static PriorityQueue<Patient> queue = new PriorityQueue<>();
     private static Scanner sc = new Scanner(System.in);
+    private static HospitalSystem system = new HospitalSystem();
 
     public static void main(String[] args) {
-
-        int choice;
 
         System.out.println("====================================");
         System.out.println("  HOSPITAL PATIENT PRIORITY SYSTEM  ");
         System.out.println("====================================");
 
+        system.loadFromFile();
+
+        int choice;
+
         do {
             showMenu();
-            choice = sc.nextInt();
-            sc.nextLine();
+            choice = readInt("Enter choice: ");
 
             switch (choice) {
                 case 1:
                     addPatient();
                     break;
                 case 2:
-                    attendNext();
+                    system.attendNext();
                     break;
                 case 3:
-                    viewAll();
+                    system.viewAll();
                     break;
                 case 4:
-                    totalWaiting();
+                    system.totalWaiting();
                     break;
                 case 5:
+                    system.undoLastAttend();
+                    break;
+                case 6:
+                    system.showAnalytics();
+                    break;
+                case 7:
+                    system.saveToFile();
                     System.out.println("Exiting system. Goodbye!");
                     break;
                 default:
                     System.out.println("Invalid choice. Try again.");
             }
 
-        } while (choice != 5);
+        } while (choice != 7);
 
         sc.close();
     }
@@ -49,61 +56,74 @@ public class Main {
         System.out.println("2. Attend Next Patient");
         System.out.println("3. View All Patients");
         System.out.println("4. Total Patients Waiting");
-        System.out.println("5. Exit");
-        System.out.print("Enter choice: ");
+        System.out.println("5. Undo Last Attend");
+        System.out.println("6. View Analytics");
+        System.out.println("7. Save & Exit");
     }
 
     static void addPatient() {
         System.out.print("Enter patient name: ");
         String name = sc.nextLine();
 
-        System.out.print("Enter age: ");
-        int age = sc.nextInt();
-        sc.nextLine();
+        int age = readInt("Enter age: ");
 
         System.out.print("Enter condition: ");
         String condition = sc.nextLine();
 
-        System.out.println("Priority: 1-Critical  2-High  3-Medium  4-Low");
-        System.out.print("Enter priority: ");
-        int priority = sc.nextInt();
-        sc.nextLine();
+        System.out.println("Priority Mode: 1-Manual  2-Auto (based on vitals)");
+        int mode = readInt("Enter choice: ");
 
-        Patient patient = new Patient(name, age, condition, priority);
-        queue.add(patient);
+        int priority;
+        int heartRate = 0, spo2 = 0;
+        double temperature = 0;
 
-        System.out.println("Patient " + patient.getName() + " added successfully!");
-    }
-
-    static void attendNext() {
-        if (queue.isEmpty()) {
-            System.out.println("No patients waiting.");
-            return;
+        if (mode == 2) {
+            heartRate = readInt("Enter heart rate (bpm): ");
+            spo2 = readInt("Enter SpO2 (%): ");
+            temperature = readDouble("Enter temperature (F): ");
+            priority = PriorityCalculator.calculatePriority(heartRate, spo2, temperature);
+            System.out.println("Auto-calculated priority: " + priority + " (" + priorityLabel(priority) + ")");
+        } else {
+            System.out.println("Priority: 1-Critical  2-High  3-Medium  4-Low");
+            priority = readInt("Enter priority: ");
+            if (priority < 1 || priority > 4) {
+                System.out.println("Invalid priority, defaulting to Medium.");
+                priority = 3;
+            }
         }
 
-        Patient next = queue.poll();
-
-        System.out.println("\n--- Attending Next Patient ---");
-        System.out.println("Name      : " + next.getName());
-        System.out.println("Age       : " + next.getAge());
-        System.out.println("Condition : " + next.getCondition());
-        System.out.println("Priority  : " + next.getPriorityLabel());
-        System.out.println("Patient " + next.getName() + " sent to doctor.");
+        system.addPatient(name, age, condition, priority, heartRate, spo2, temperature);
     }
 
-    static void viewAll() {
-        if (queue.isEmpty()) {
-            System.out.println("No patients in queue.");
-            return;
-        }
-
-        System.out.println("\n--- Waiting Patients ---");
-        for (Patient p : queue) {
-            System.out.println(p);
+    static String priorityLabel(int priority) {
+        switch (priority) {
+            case 1: return "CRITICAL";
+            case 2: return "HIGH";
+            case 3: return "MEDIUM";
+            default: return "LOW";
         }
     }
 
-    static void totalWaiting() {
-        System.out.println("Total patients waiting: " + queue.size());
+    // Reads an integer safely, re-prompting on invalid input instead of crashing
+    static int readInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Integer.parseInt(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a whole number.");
+            }
+        }
+    }
+
+    static double readDouble(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Double.parseDouble(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
     }
 }
